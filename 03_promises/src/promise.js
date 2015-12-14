@@ -1,25 +1,38 @@
 'use strict';
 
 function uPromise() {
+	// Can be: 1. pending 2. resolved 3. rejected
+	// Initial state is pending
+	var resolvedState = 'pending';
+	// This is either data from deferred.resolve(data) or reson from deferred.reject(reason)
+	var resolvedData = undefined;
 
-	// handlers array
-	var handlers = [];
-	// variable that shows if Deffered's work finished or not
-	var _finished = 0;
+	var resolveCallback, rejectCallback, notifyCallback;
+
+	// Reference of next uPromise
+	var nextChainedPromise;
+
 
 	// private-like methods
-	this._resolve = function() {};
-	this._reject = function() {};
-	this._notify = function() {};
+	this._resolve = function(data) {};
+	this._reject = function(reason) {};
+	this._notify = function(data) {};
+
 
 	// function for registering of callbacks
 	this.then = function(resolveCb, rejectCb, notifyCb) {
-		handlers.push({
-			resolve: resolveCb,
-			reject: rejectCb,
-			notify: notifyCb
-		})
+		resolveCallback = resolveCb;
+		rejectCallback = rejectCb;
+		notifyCallback = notifyCb;
 
-		return this;
+		this._isSet = true;
+
+		nextChainedPromise = new uPromise();
+		return nextChainedPromise;
 	};
+
+
+	this.nextPromise = nextChainedPromise;
+	// property for querying if there is next promise set
+	this._isSet = false;
 };

@@ -57,5 +57,28 @@ describe('uPromise object', function() {
 			expect(p.then() instanceof uPromise).toBeTruthy();
 		});
 
+		it('run handlers in the order they were registered', function() {
+			
+		});
+
+	});
+
+	describe('when parent deferred is not yet finished', function() {
+		describe('when 1 handler set up it should run', function() {
+			it('notification callback', function() {});
+			it('resolution callback', function() {});
+			it('rejection callback', function() {});
+		});
+		describe('when many (2) handlers are set up it should run', function() {
+			it('notification callback', function() {});
+			it('resolution callback', function() {});
+			it('rejection callback', function() {});
+		});
+	});
+
+	describe('when parent deferred is finished', function() {
+		it('should resolve newly registered handler if it was resolved', function() {});
+		it('should reject newly registered handler if it was rejected', function() {});
+		it('should not change status', function() {});
 	});
 });
