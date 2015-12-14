@@ -17,10 +17,7 @@ describe('uPromise object', function() {
 	it('should be defined after initialization', function() {
 		expect(p).toBeDefined();
 		expect(p).toEqual(jasmine.any(Object));
-	});
-
-	it('should have the state property', function() {
-		expect(p._state).toBeDefined();
+		expect(p instanceof uPromise).toBeTruthy();
 	});
 
 	describe('should expose methods to trigger', function() {
@@ -54,6 +51,10 @@ describe('uPromise object', function() {
 
 		it('be callable multiple times to register multiple observers', function() {
 
+		});
+
+		it('be chainable', function() {
+			expect(p.then() instanceof uPromise).toBeTruthy();
 		});
 
 	});

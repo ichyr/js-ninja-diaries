@@ -37,6 +37,4 @@ function uDeferred() {
 			this.promise._notify(data);
 		}
 	};
-
-	// what if error was thrown?
 };
