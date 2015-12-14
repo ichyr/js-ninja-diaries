@@ -25,7 +25,7 @@ describe('uDeferred object', function() {
 			expect(d.promise).toEqual(jasmine.any(Object));
 		});
 
-		it('instance of Promise class', function() {
+		it('instance of uPromise class', function() {
 			expect(d.promise).toEqual(jasmine.any(uPromise));		
 		});		
 
@@ -33,8 +33,28 @@ describe('uDeferred object', function() {
 			function test() {
 				d.promise = {val: 'new'};	
 			}
-			
 			expect(test).toThrow();
+		});
+	});
+
+	describe('.notify method should', function() {
+		it('be defined', function() {
+			expect(d.notify).toBeDefined();
+			expect(d.notify).toEqual(jasmine.any(Function));
+		});
+	});
+
+	describe('.resolve method should', function() {
+		it('be defined', function() {
+			expect(d.resolve).toBeDefined();
+			expect(d.resolve).toEqual(jasmine.any(Function));
+		});
+	});
+
+	describe('.reject method should', function() {
+		it('be defined', function() {
+			expect(d.reject).toBeDefined();
+			expect(d.reject).toEqual(jasmine.any(Function));
 		});
 	});
 });
