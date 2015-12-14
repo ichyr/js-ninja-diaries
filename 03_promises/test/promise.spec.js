@@ -19,6 +19,27 @@ describe('uPromise object', function() {
 		expect(p).toEqual(jasmine.any(Object));
 	});
 
+	it('should have the state property', function() {
+		expect(p._state).toBeDefined();
+	});
+
+	describe('should expose methods to trigger', function() {
+		it('resolution', function() {
+			expect(p._resolve).toBeDefined();
+			expect(p._resolve).toEqual(jasmine.any(Function));
+		});
+
+		it('rejection', function() {
+			expect(p._reject).toBeDefined();
+			expect(p._reject).toEqual(jasmine.any(Function));
+		});
+
+		it('update', function() {
+			expect(p._notify).toBeDefined();
+			expect(p._notify).toEqual(jasmine.any(Function));
+		});
+	});
+
 	describe('.then method should', function() {
 		it('be defined', function() {
 			expect(p.then).toBeDefined();
@@ -34,7 +55,6 @@ describe('uPromise object', function() {
 		it('be callable multiple times to register multiple observers', function() {
 
 		});
-
 
 	});
 });

@@ -37,12 +37,6 @@ describe('uDeferred object', function() {
 		});
 	});
 
-	describe('.notify method should', function() {
-		it('be defined', function() {
-			expect(d.notify).toBeDefined();
-			expect(d.notify).toEqual(jasmine.any(Function));
-		});
-	});
 
 	describe('.resolve method should', function() {
 		it('be defined', function() {
@@ -51,7 +45,10 @@ describe('uDeferred object', function() {
 		});
 
 		it('be callable only once', function() {
-
+			spyOn(d.promise, '_resolve');
+			d.resolve();
+			d.resolve();
+			expect(d.promise._resolve.calls.count()).toEqual(1);
 		});
 	});
 
@@ -62,7 +59,32 @@ describe('uDeferred object', function() {
 		});
 
 		it('be callable only once', function() {
-				
+			spyOn(d.promise, '_reject');
+			d.reject();
+			d.reject();
+			expect(d.promise._reject.calls.count()).toEqual(1);
+		});
+	});
+
+	describe('.notify method should', function() {
+		it('be defined', function() {
+			expect(d.notify).toBeDefined();
+			expect(d.notify).toEqual(jasmine.any(Function));
+		});
+
+		it('be callable many times', function() {
+			spyOn(d.promise, '_notify');
+			d.notify();
+			d.notify();
+			expect(d.promise._notify.calls.count()).toEqual(2);
+		});
+
+		it('not be fired when deferred\'s has been work finished', function() {
+			spyOn(d.promise, '_notify');
+			d.notify();
+			d.resolve();
+			d.notify();
+			expect(d.promise._notify.calls.count()).toEqual(1);
 		});
 	});
 });

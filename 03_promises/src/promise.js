@@ -1,10 +1,17 @@
 'use strict';
 
 function uPromise() {
-	
-	// resolution flow callbacks
-	var fulfilledCallback = function() {};
-	var rejectedCallback = function() {};
+
+	// handlers array
+	var handlers = [];
+
+	// private-like variables
+	this._state = 0;
+
+	// private-like methods
+	this._resolve = function() {};
+	this._reject = function() {};
+	this._notify = function() {};
 
 	// public properties
 
