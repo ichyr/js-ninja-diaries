@@ -49,12 +49,20 @@ describe('uDeferred object', function() {
 			expect(d.resolve).toBeDefined();
 			expect(d.resolve).toEqual(jasmine.any(Function));
 		});
+
+		it('be callable only once', function() {
+
+		});
 	});
 
 	describe('.reject method should', function() {
 		it('be defined', function() {
 			expect(d.reject).toBeDefined();
 			expect(d.reject).toEqual(jasmine.any(Function));
+		});
+
+		it('be callable only once', function() {
+				
 		});
 	});
 });

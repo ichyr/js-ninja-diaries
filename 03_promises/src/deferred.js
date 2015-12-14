@@ -11,13 +11,13 @@ function uDeferred() {
 	// set up of public instance API methods
 
 	// notification about work done
-	this.notify = function() {};
+	this.notify = function(data) {};
 
 	// notification about work successfully completed
-	this.resolve = function() {};
+	this.resolve = function(data) {};
 
 	// notification about work failed to complete
-	this.reject = function() {};
+	this.reject = function(data) {};
 
 	// what if error was thrown?
 };
