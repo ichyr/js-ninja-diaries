@@ -1,38 +1,68 @@
 'use strict';
 
 function uPromise() {
-	// Can be: 1. pending 2. resolved 3. rejected
+	var defferedStatuses = {
+		'pending': 0,
+		'resolved': 1,
+		'rejected': 2
+	}
+
+	// handlers array
+	var handlers = [];
+	var callHandlers = function(handlers, action, data) {
+		if (handlers.length > 0) {
+			try {
+				handlers.shift()[action](data);
+				callHandlers(handlers, action, data);
+			} catch (error) {
+				callHandlers(handlers, 'reject', error);
+			}
+		}
+	};
+
 	// Initial state is pending
-	var resolvedState = 'pending';
+	var resolvedState = defferedStatuses['pending'];
 	// This is either data from deferred.resolve(data) or reson from deferred.reject(reason)
 	var resolvedData = undefined;
 
-	var resolveCallback, rejectCallback, notifyCallback;
-
-	// Reference of next uPromise
-	var nextChainedPromise;
-
-
 	// private-like methods
-	this._resolve = function(data) {};
-	this._reject = function(reason) {};
-	this._notify = function(data) {};
 
+	// TODO check for resolved or not.
+	this._resolve = function(data) {
+		if (!resolvedState) {
+			resolvedState = defferedStatuses['resolved'];
+			resolvedData = data;
 
-	// function for registering of callbacks
-	this.then = function(resolveCb, rejectCb, notifyCb) {
-		resolveCallback = resolveCb;
-		rejectCallback = rejectCb;
-		notifyCallback = notifyCb;
-
-		this._isSet = true;
-
-		nextChainedPromise = new uPromise();
-		return nextChainedPromise;
+			callHandlers(handlers, 'resolved', data);
+		}
 	};
 
+	this._reject = function(reason) {
+		if (!resolvedState) {
+			resolvedState = defferedStatuses['resolved'];
+			resolvedData = reason;
+			
+			callHandlers(handlers, 'reject', reason);
+		}
+	};
 
-	this.nextPromise = nextChainedPromise;
-	// property for querying if there is next promise set
-	this._isSet = false;
+	this._notify = function(data) {
+		if (!resolvedState) {
+			handlers.forEach(function(h) {
+				h.notifyCb(data);
+			})
+		}
+	};
+
+	// function for registering of callbacks
+	// how to chain if deffered was resolved?
+	this.then = function(resolveCb, rejectCb, notifyCb) {
+		handlers.push({
+			resolve: resolveCb,
+			reject: rejectCb,
+			notify: notifyCb
+		})
+
+		return this;
+	};
 };
