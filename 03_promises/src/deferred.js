@@ -19,6 +19,7 @@ function uDeferred() {
 	this.resolve = function(data) {
 		if (_working) {
 			this.promise._resolve(data);
+			console.log('resolving promise!');
 			_working = false;
 		}
 	};

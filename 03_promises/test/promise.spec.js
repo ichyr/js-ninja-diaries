@@ -1,5 +1,7 @@
 'use strict';
 
+var result = '';
+
 describe('uPromise constructor function', function() {
 	it('should be defined', function() {
 		expect(uPromise).toBeDefined();
@@ -50,7 +52,20 @@ describe('uPromise object', function() {
 		});
 
 		it('be callable multiple times to register multiple observers', function() {
+			var d = new uDeferred();
+			var p = d.promise;
+			result = '';
 
+			p.then(function(data) {
+				result += 'a'
+			});
+			p.then(function(data) {
+				result += 'b'
+			});
+
+			d.resolve(0);
+
+			expect(result).toEqual('ab');
 		});
 
 		it('be chainable', function() {
@@ -58,27 +73,114 @@ describe('uPromise object', function() {
 		});
 
 		it('run handlers in the order they were registered', function() {
-			
+			var d = new uDeferred();
+			var p = d.promise;
+			var result = 'a';
+
+			p.then(function(data) {
+				result += 'b'
+			});
+			p.then(function(data) {
+				result += 'c'
+			});
+
+			d.resolve();
+
+			expect(result).toEqual('abc');
 		});
 
 	});
 
 	describe('when parent deferred is not yet finished', function() {
-		describe('when 1 handler set up it should run', function() {
-			it('notification callback', function() {});
-			it('resolution callback', function() {});
-			it('rejection callback', function() {});
+		// blank function for test purposes
+		var t = function() {};
+		var r = function(data) { result += data; };
+		var d, p;
+
+		beforeEach(function() {
+			d = new uDeferred();
+			p = d.promise;
+			result = '';
 		});
+
+		describe('when 1 handler set up it should run', function() {
+			it('resolution callback', function() {
+				p.then(function(data) {
+					result += 'b'
+				});
+				d.resolve();
+				expect(result).toEqual('b');
+			});
+			it('rejection callback', function() {
+				p.then(function(data) {
+					result += 'b'
+				});
+				d.resolve();
+				expect(result).toEqual('b');
+			});
+			it('notification callback', function() {
+				p.then(t, t, function() {
+					result += 'b';
+				});
+				d.notify();
+				expect(result).toEqual('b');
+			});
+		});
+
 		describe('when many (2) handlers are set up it should run', function() {
-			it('notification callback', function() {});
-			it('resolution callback', function() {});
-			it('rejection callback', function() {});
+			it('notification callback', function() {
+				p.then(t, t, r);
+				p.then(t, t, r);
+				d.notify('a');
+				expect(result).toEqual('aa');
+			});
+			it('resolution callback', function() {
+				p.then(r);
+				p.then(r);
+				d.resolve('a');
+				expect(result).toEqual('aa');
+			});
+			it('rejection callback', function() {
+				p.then(t, r);
+				p.then(t, r);
+				d.reject('a');
+				expect(result).toEqual('aa');
+			});
 		});
 	});
 
 	describe('when parent deferred is finished', function() {
-		it('should resolve newly registered handler if it was resolved', function() {});
-		it('should reject newly registered handler if it was rejected', function() {});
-		it('should not change status', function() {});
+		// blank function for test purposes
+		var t = function() {};
+		var r = function(data) { result += data; };
+		var d, p;
+
+		beforeEach(function() {
+			d = new uDeferred();
+			p = d.promise;
+			result = '';
+		});
+
+		it('should resolve newly registered handler if it was resolved', function() {
+			d.resolve('a');
+			p.then(r);
+			p.then(r);
+			expect(result).toEqual('aa');
+		});
+
+		it('should reject newly registered handler if it was rejected', function() {
+			d.reject('a');
+			p.then(t, r);
+			p.then(t, r);
+			expect(result).toEqual('aa');
+		});
+		it('should not change status', function() {
+			d.reject('a');
+			p.then(t, r);
+			d.resolve('b');
+			p.then(r);
+			d.reject('c');
+			expect(result).toEqual('a');
+		});
 	});
 });
