@@ -19,7 +19,6 @@ function uDeferred() {
 	this.resolve = function(data) {
 		if (_working) {
 			this.promise._resolve(data);
-			console.log('resolving promise!');
 			_working = false;
 		}
 	};
@@ -32,7 +31,7 @@ function uDeferred() {
 		}
 	};
 
-	// notification about work done
+	// notification from work being done
 	this.notify = function(data) {
 		if (_working) {
 			this.promise._notify(data);

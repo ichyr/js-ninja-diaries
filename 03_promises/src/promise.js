@@ -63,15 +63,14 @@ function uPromise() {
 	// function for registering of callbacks
 	// how to chain if deffered was resolved?
 	this.then = function(resolveCb, rejectCb, notifyCb) {
-		console.log('added then');
 		switch (resolvedState) {
 			case defferedStatuses['resolved']:
 				resolveCb(resolvedData);
-				console.log('resolved with value ' + resolvedData);
+	
 				break;
 			case defferedStatuses['rejected']:
 				rejectCb(resolvedData);
-				console.log('rejected with value ' + resolvedData);
+	
 				break;
 			default:
 				handlers.push({
@@ -79,7 +78,7 @@ function uPromise() {
 					'reject': rejectCb,
 					'notify': notifyCb
 				});
-				console.log('pushed to list');
+	
 		}
 
 		return this;

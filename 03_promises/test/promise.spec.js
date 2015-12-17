@@ -178,7 +178,7 @@ describe('uPromise object', function() {
 			d.reject('a');
 			p.then(t, r);
 			d.resolve('b');
-			p.then(r);
+			p.then(r, t);
 			d.reject('c');
 			expect(result).toEqual('a');
 		});
