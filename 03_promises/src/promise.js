@@ -10,17 +10,20 @@ function uPromise() {
 	// handlers array
 	var handlers = [];
 	var callHandlers = function(handlers, action, data) {
-		var temp;
+		var temp, result;
 		if (handlers.length > 0) {
+			temp = handlers.shift();
 			try {
-				temp = handlers.shift();
-				if (data) {
-					temp[action](data);
-				} else {
-					temp[action]();
-				}
+				result = data ? temp[action](data) : temp[action]();
+				temp['deferred'][action](result);
+				// if (data) {
+					// temp[action](data);
+				// } else {
+					// temp[action]();
+				// }
 				callHandlers(handlers, action, data);
 			} catch (error) {
+				temp['deferred'].reject(error.message);
 				callHandlers(handlers, 'reject', error);
 			}
 		}
@@ -35,6 +38,7 @@ function uPromise() {
 
 	// TODO check for resolved or not.
 	this._resolve = function(data) {
+		/* istanbul ignore else */
 		if (!resolvedState) {
 			resolvedState = defferedStatuses['resolved'];
 			resolvedData = data;
@@ -44,6 +48,7 @@ function uPromise() {
 	};
 
 	this._reject = function(reason) {
+		/* istanbul ignore else */
 		if (!resolvedState) {
 			resolvedState = defferedStatuses['rejected'];
 			resolvedData = reason;
@@ -53,6 +58,7 @@ function uPromise() {
 	};
 
 	this._notify = function(data) {
+		/* istanbul ignore else */
 		if (!resolvedState) {
 			handlers.forEach(function(h) {
 				h['notify'](data);
@@ -63,24 +69,28 @@ function uPromise() {
 	// function for registering of callbacks
 	// how to chain if deffered was resolved?
 	this.then = function(resolveCb, rejectCb, notifyCb) {
+		var deferred = new uDeferred();
+		var data;
+
 		switch (resolvedState) {
 			case defferedStatuses['resolved']:
-				resolveCb(resolvedData);
-	
+				data = resolveCb(resolvedData);
+				deferred.resolve(data);
 				break;
 			case defferedStatuses['rejected']:
-				rejectCb(resolvedData);
-	
+				data = rejectCb(resolvedData);
+				deferred.reject(data);
 				break;
 			default:
 				handlers.push({
 					'resolve': resolveCb,
 					'reject': rejectCb,
-					'notify': notifyCb
+					'notify': notifyCb,
+					'deferred': deferred
 				});
-	
 		}
 
-		return this;
+		return deferred.promise;
+
 	};
 };

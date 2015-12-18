@@ -69,7 +69,9 @@ describe('uPromise object', function() {
 		});
 
 		it('be chainable', function() {
-			expect(p.then() instanceof uPromise).toBeTruthy();
+			var then = p.then();
+			expect(then instanceof uPromise).toBeTruthy();
+			expect(then).not.toEqual(p);
 		});
 
 		it('run handlers in the order they were registered', function() {
@@ -94,7 +96,9 @@ describe('uPromise object', function() {
 	describe('when parent deferred is not yet finished', function() {
 		// blank function for test purposes
 		var t = function() {};
-		var r = function(data) { result += data; };
+		var r = function(data) {
+			result += data;
+		};
 		var d, p;
 
 		beforeEach(function() {
@@ -147,12 +151,46 @@ describe('uPromise object', function() {
 				expect(result).toEqual('aa');
 			});
 		});
+
+		describe('when 2 promises are chained', function() {
+			var temp;
+			var s = function(data) {
+				return data;
+			};
+
+			it('last one should resolve with return value from resolution of first one', function() {
+				var second = p.then(s);
+				var data = '123';
+				second.then(r);
+				d.resolve(data);
+				expect(result).toEqual(data);
+			});
+
+			it('last one should reject with return value from rejection of first one', function() {
+				var second = p.then(r, s);
+				var data = '123';
+				second.then(r, r);
+				d.reject(data);
+				expect(result).toEqual(data);
+			});
+
+			it('last one should reject with error message if first one throws error', function() {
+				var second = p.then(function() { throw new Error('Error code 123');});
+				var data = 'Error code 123';
+				second.then(r, r);
+				d.resolve(data);
+				expect(result).toEqual(data);
+			});
+
+		});
 	});
 
 	describe('when parent deferred is finished', function() {
 		// blank function for test purposes
 		var t = function() {};
-		var r = function(data) { result += data; };
+		var r = function(data) {
+			result += data;
+		};
 		var d, p;
 
 		beforeEach(function() {
@@ -167,7 +205,6 @@ describe('uPromise object', function() {
 			p.then(r);
 			expect(result).toEqual('aa');
 		});
-
 		it('should reject newly registered handler if it was rejected', function() {
 			d.reject('a');
 			p.then(t, r);
